@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat - SafeTrade Games</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8fafc;
+            color: #334155;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateX(-3px);
+        }
+
+        .escrow-info h2 {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .escrow-info p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .escrow-status {
+            padding: 6px 15px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: #f1f5f9;
+        }
+
+        .message {
+            max-width: 70%;
+            padding: 15px;
+            border-radius: 18px;
+            position: relative;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.seller {
+            align-self: flex-start;
+            background: white;
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .message.buyer {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .message.system {
+            align-self: center;
+            background: #fef3c7;
+            color: #92400e;
+            text-align: center;
+            max-width: 90%;
+            border-radius: 12px;
+            padding: 12px 20px;
+            font-weight: bold;
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+        }
+
+        .message.seller .message-header {
+            color: #64748b;
+        }
+
+        .message.buyer .message-header {
+            color: rgba(255,255,255,0.9);
+        }
+
+        .message-sender {
+            font-weight: bold;
+        }
+
+        .message-time {
+            opacity: 0.8;
+        }
+
+        .message-content {
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        .message.system .message-content {
+            text-align: center;
+        }
+
+        .chat-input-container {
+            padding: 20px;
+            border-top: 1px solid #e2e8f0;
+            background: white;
+        }
+
+        .chat-form {
+            display: flex;
+            gap: 12px;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 25px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+            resize: none;
+            max-height: 120px;
+        }
+
+        .message-input:focus {
+            border-color: #7c3aed;
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+        }
+
+        .send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(124, 58, 237, 0.3);
+        }
+
+        .send-btn:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .payment-notice {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 12px 20px;
+            border-radius: 12px;
+            margin: 10px 20px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 4px solid #10b981;
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #64748b;
+            font-size: 1.1rem;
+        }
+
+        .loading i {
+            font-size: 2rem;
+            margin-right: 15px;
+        }
+
+        .empty-chat {
+            text-align: center;
+            padding: 40px;
+            color: #94a3b8;
+        }
+
+        .empty-chat i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #cbd5e1;
+        }
+
+        .complete-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .complete-btn:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .chat-container {
+                height: 100vh;
+            }
+            
+            .chat-header {
+                padding: 15px;
+            }
+            
+            .escrow-info h2 {
+                font-size: 1rem;
+            }
+            
+            .escrow-info p {
+                font-size: 0.8rem;
+            }
+            
+            .chat-messages {
+                padding: 15px;
+            }
+            
+            .message {
+                max-width: 85%;
+            }
+            
+            .chat-input-container {
+                padding: 15px;
+            }
+            
+            .send-btn {
+                width: 45px;
+                height: 45px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="header-left">
+                <!-- CORRIGIDO: Botão voltar para dashboard -->
+                <button class="back-btn" onclick="goBackToDashboard()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="escrow-info">
+                    <h2 id="escrowTitle">Carregando...</h2>
+                    <p id="escrowDetails">Código: ---</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="escrow-status" id="escrowStatus">---</div>
+                <button class="complete-btn" id="completeBtn" style="display: none;">
+                    <i class="fas fa-check"></i> Confirmar Recebimento
+                </button>
+            </div>
+        </div>
+
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="loading">
+                <i class="fas fa-spinner fa-spin"></i>
+                <span>Conectando ao chat...</span>
+            </div>
+        </div>
+
+        <div class="chat-input-container">
+            <form class="chat-form" id="chatForm">
+                <textarea class="message-input" id="messageInput" 
+                          placeholder="Digite sua mensagem..." 
+                          rows="1"></textarea>
+                <button type="submit" class="send-btn" id="sendBtn" disabled>
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
+    <script>
+        const API_URL = 'http://localhost:3000/api';
+        let socket = null;
+        let currentUser = null;
+        let currentEscrow = null;
+        let escrowId = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verificar autenticação
+            const token = localStorage.getItem('token');
+            const user = localStorage.getItem('user');
+            
+            if (!token || !user) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // Obter ID do intermédio da URL
+            const urlParams = new URLSearchParams(window.location.search);
+            escrowId = urlParams.get('escrowId');
+            
+            if (!escrowId) {
+                alert('ID do intermédio não especificado');
+                window.location.href = 'dashboard.html';
+                return;
+            }
+            
+            try {
+                currentUser = JSON.parse(user);
+                loadEscrowInfo();
+                connectWebSocket();
+            } catch (error) {
+                console.error('Erro ao carregar chat:', error);
+                showError('Erro ao carregar chat');
+            }
+        });
+
+        // CORRIGIDO: Função para voltar ao dashboard
+        function goBackToDashboard() {
+            window.location.href = 'dashboard.html';
+        }
+
+        async function loadEscrowInfo() {
+            try {
+                const token = localStorage.getItem('token');
+                
+                const response = await fetch(`${API_URL}/escrow/${escrowId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Erro ao carregar intermédio');
+                }
+                
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.error || 'Erro ao carregar intermédio');
+                }
+                
+                currentEscrow = data.escrow;
+                updateEscrowInfo();
+                
+            } catch (error) {
+                console.error('Erro:', error);
+                showError('Erro ao carregar informações do intermédio');
+            }
+        }
+
+        function updateEscrowInfo() {
+            if (!currentEscrow) return;
+            
+            // Atualizar título e detalhes
+            document.getElementById('escrowTitle').textContent = currentEscrow.itemName || 'Intermédio';
+            document.getElementById('escrowDetails').textContent = 
+                `Código: ${currentEscrow.code} • Valor: R$ ${formatCurrency(currentEscrow.value)}`;
+            
+            // Atualizar status
+            const statusElement = document.getElementById('escrowStatus');
+            const statusText = getStatusText(currentEscrow.status);
+            const statusColor = getStatusColor(currentEscrow.status);
+            statusElement.textContent = statusText;
+            statusElement.style.background = statusColor;
+            
+            // Mostrar/ocultar botão de completar
+            const completeBtn = document.getElementById('completeBtn');
+            if (currentEscrow.status === 'paid' && currentUser.id === currentEscrow.buyerId) {
+                completeBtn.style.display = 'block';
+                completeBtn.onclick = completeEscrow;
+            } else {
+                completeBtn.style.display = 'none';
+            }
+            
+            // Mostrar aviso de pagamento para compradores
+            const paymentNotice = document.getElementById('paymentNotice');
+            if (currentUser.id === currentEscrow.buyerId && currentEscrow.status === 'waiting_payment') {
+                paymentNotice.style.display = 'flex';
+            } else {
+                paymentNotice.style.display = 'none';
+            }
+        }
+
+        function connectWebSocket() {
+            try {
+                socket = io('http://localhost:3000');
+                
+                socket.on('connect', () => {
+                    console.log('🔌 Conectado ao WebSocket');
+                    
+                    // Entrar na sala do intermédio
+                    socket.emit('join_escrow', escrowId);
+                    
+                    // Habilitar campo de mensagem
+                    const messageInput = document.getElementById('messageInput');
+                    const sendBtn = document.getElementById('sendBtn');
+                    if (messageInput && sendBtn) {
+                        sendBtn.disabled = false;
+                    }
+                });
+                
+                // Receber histórico do chat
+                socket.on('chat_history', (messages) => {
+                    console.log('📨 Histórico recebido:', messages.length, 'mensagens');
+                    loadChatHistory(messages);
+                });
+                
+                // Receber nova mensagem
+                socket.on('new_message', (message) => {
+                    console.log('📩 Nova mensagem:', message);
+                    addMessageToChat(message);
+                    
+                    // Scroll para baixo
+                    setTimeout(() => {
+                        scrollToBottom();
+                    }, 100);
+                });
+                
+                socket.on('disconnect', () => {
+                    console.log('❌ Desconectado do WebSocket');
+                    const sendBtn = document.getElementById('sendBtn');
+                    if (sendBtn) {
+                        sendBtn.disabled = true;
+                    }
+                });
+                
+                // Configurar envio de mensagens
+                const chatForm = document.getElementById('chatForm');
+                const messageInput = document.getElementById('messageInput');
+                
+                if (chatForm && messageInput) {
+                    // Auto-expand textarea
+                    messageInput.addEventListener('input', function() {
+                        this.style.height = 'auto';
+                        this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+                    });
+                    
+                    chatForm.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        
+                        const message = messageInput.value.trim();
+                        if (!message || !socket.connected) return;
+                        
+                        // Enviar mensagem via WebSocket
+                        socket.emit('send_message', {
+                            escrowId: escrowId,
+                            userId: currentUser.id,
+                            userName: currentUser.username,
+                            message: message
+                        });
+                        
+                        // Limpar campo
+                        messageInput.value = '';
+                        messageInput.style.height = 'auto';
+                        
+                        // Dar foco novamente
+                        messageInput.focus();
+                    });
+                }
+                
+            } catch (error) {
+                console.error('Erro ao conectar WebSocket:', error);
+                showError('Erro de conexão com o servidor');
+            }
+        }
+
+        function loadChatHistory(messages) {
+            const chatMessages = document.getElementById('chatMessages');
+            if (!chatMessages) return;
+            
+            if (messages.length === 0) {
+                chatMessages.innerHTML = `
+                    <div class="empty-chat">
+                        <i class="fas fa-comments"></i>
+                        <h3>Nenhuma mensagem ainda</h3>
+                        <p>Seja o primeiro a enviar uma mensagem!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            chatMessages.innerHTML = '';
+            
+            messages.forEach(message => {
+                addMessageToChat(message);
+            });
+            
+            // Scroll para baixo
+            setTimeout(() => {
+                scrollToBottom();
+            }, 100);
+        }
+
+        function addMessageToChat(message) {
+            const chatMessages = document.getElementById('chatMessages');
+            if (!chatMessages) return;
+            
+            // Remover mensagem de carregamento se existir
+            const loading = chatMessages.querySelector('.loading');
+            if (loading) {
+                loading.remove();
+            }
+            
+            // Remover mensagem de chat vazio se existir
+            const emptyChat = chatMessages.querySelector('.empty-chat');
+            if (emptyChat) {
+                emptyChat.remove();
+            }
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${message.type || 'system'}`;
+            
+            const time = formatTime(message.timestamp);
+            
+            if (message.senderId === 'system') {
+                messageDiv.innerHTML = `
+                    <div class="message-content">
+                        ${message.message}
+                    </div>
+                `;
+            } else {
+                const isSeller = currentEscrow && message.senderId === currentEscrow.sellerId;
+                const senderName = isSeller ? 'Vendedor' : 'Comprador';
+                
+                messageDiv.innerHTML = `
+                    <div class="message-header">
+                        <span class="message-sender">${senderName}</span>
+                        <span class="message-time">${time}</span>
+                    </div>
+                    <div class="message-content">
+                        ${message.message}
+                    </div>
+                `;
+            }
+            
+            chatMessages.appendChild(messageDiv);
+        }
+
+        async function completeEscrow() {
+            if (!confirm('Tem certeza que deseja confirmar o recebimento e finalizar o intermédio?\n\nEsta ação liberará o valor para saque do vendedor.')) {
+                return;
+            }
+            
+            try {
+                const token = localStorage.getItem('token');
+                
+                const response = await fetch(`${API_URL}/escrow/${escrowId}/complete`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.error || 'Erro ao finalizar intermédio');
+                }
+                
+                alert('✅ Intermédio finalizado! O vendedor já pode sacar o valor.');
+                
+                // Recarregar informações do intermédio
+                loadEscrowInfo();
+                
+            } catch (error) {
+                alert('Erro: ' + error.message);
+            }
+        }
+
+        function scrollToBottom() {
+            const chatMessages = document.getElementById('chatMessages');
+            if (chatMessages) {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+        }
+
+        function formatTime(dateString) {
+            try {
+                const date = new Date(dateString);
+                return date.toLocaleTimeString('pt-BR', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+            } catch (e) {
+                return '--:--';
+            }
+        }
+
+        function formatCurrency(value) {
+            if (isNaN(value)) value = 0;
+            return value.toFixed(2).replace('.', ',');
+        }
+
+        function getStatusText(status) {
+            const statusMap = {
+                'awaiting_buyer': '🕐 Aguardando Comprador',
+                'waiting_payment': '💰 Aguardando Pagamento',
+                'paid': '✅ Pago',
+                'completed': '🎉 Concluído'
+            };
+            return statusMap[status] || status;
+        }
+
+        function getStatusColor(status) {
+            const colorMap = {
+                'awaiting_buyer': 'rgba(245, 158, 11, 0.3)',
+                'waiting_payment': 'rgba(59, 130, 246, 0.3)',
+                'paid': 'rgba(16, 185, 129, 0.3)',
+                'completed': 'rgba(139, 92, 246, 0.3)'
+            };
+            return colorMap[status] || 'rgba(100, 116, 139, 0.3)';
+        }
+
+        function showError(message) {
+            const chatMessages = document.getElementById('chatMessages');
+            if (chatMessages) {
+                chatMessages.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #ef4444;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 20px;"></i>
+                        <h3>Erro</h3>
+                        <p>${message}</p>
+                        <button onclick="goBackToDashboard()" 
+                                style="background: #7c3aed; color: white; border: none; padding: 10px 20px; border-radius: 6px; margin-top: 20px; cursor: pointer;">
+                            Voltar ao Dashboard
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        // Focar no campo de mensagem ao carregar
+        window.onload = function() {
+            const messageInput = document.getElementById('messageInput');
+            if (messageInput) {
+                messageInput.focus();
+            }
+        };
+    </script>
+</body>
+</html>
