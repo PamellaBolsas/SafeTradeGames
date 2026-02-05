@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retiro - SafeTrade Games</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8fafc;
+            color: #334155;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .back-btn {
+            background: #f1f5f9;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #64748b;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #e2e8f0;
+            color: #334155;
+            transform: translateX(-3px);
+        }
+
+        .header-content h1 {
+            font-size: 2rem;
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+
+        .header-content p {
+            color: #64748b;
+            font-size: 1.1rem;
+        }
+
+        .balance-info {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 2px solid #e2e8f0;
+        }
+
+        .balance-display {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .balance-label {
+            color: #64748b;
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+
+        .balance-amount {
+            font-size: 3.5rem;
+            font-weight: bold;
+            color: #7c3aed;
+            margin-bottom: 20px;
+        }
+
+        .balance-amount span {
+            font-size: 2rem;
+            color: #334155;
+        }
+
+        .tax-notice {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 15px 20px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .tax-notice i {
+            font-size: 1.2rem;
+        }
+
+        .withdraw-form {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .form-title {
+            font-size: 1.5rem;
+            color: #334155;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: #475569;
+            font-weight: 500;
+            font-size: 1rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 18px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background: #f8fafc;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #7c3aed;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: #94a3b8;
+        }
+
+        .cvu-help {
+            color: #64748b;
+            font-size: 0.85rem;
+            margin-top: 8px;
+        }
+
+        .cvu-help a {
+            color: #7c3aed;
+            text-decoration: none;
+        }
+
+        .cvu-help a:hover {
+            text-decoration: underline;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            padding: 20px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+        }
+
+        .submit-btn:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .submit-btn.no-balance {
+            background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+            cursor: not-allowed;
+        }
+
+        .submit-btn.no-balance:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .notification.success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .withdraw-history {
+            margin-top: 50px;
+        }
+
+        .history-title {
+            font-size: 1.5rem;
+            color: #334155;
+            margin-bottom: 25px;
+        }
+
+        .history-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .history-item {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-info h4 {
+            color: #334155;
+            margin-bottom: 5px;
+        }
+
+        .history-info p {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .history-amount {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #10b981;
+        }
+
+        .history-amount.negative {
+            color: #ef4444;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #64748b;
+        }
+
+        .loading i {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .bank-selector {
+            width: 100%;
+            padding: 18px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: #f8fafc;
+            color: #334155;
+            margin-bottom: 10px;
+        }
+
+        .bank-selector:focus {
+            outline: none;
+            border-color: #7c3aed;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+        }
+
+        .currency-notice {
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .currency-notice i {
+            color: #3b82f6;
+            margin-right: 8px;
+        }
+
+        /* Animações de confirmação */
+        .confirmation-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .confirmation-overlay.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .confirmation-modal {
+            background: white;
+            border-radius: 24px;
+            padding: 50px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            transform: translateY(20px);
+            opacity: 0;
+            animation: modalAppear 0.5s ease forwards 0.3s;
+        }
+
+        @keyframes modalAppear {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .confirmation-icon {
+            font-size: 4rem;
+            color: #10b981;
+            margin-bottom: 30px;
+            animation: bounce 1s ease infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-15px);
+            }
+        }
+
+        .confirmation-title {
+            font-size: 2rem;
+            color: #1e293b;
+            margin-bottom: 20px;
+            animation: fadeInUp 0.5s ease forwards 0.5s;
+            opacity: 0;
+        }
+
+        .confirmation-message {
+            font-size: 1.1rem;
+            color: #64748b;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            animation: fadeInUp 0.5s ease forwards 0.7s;
+            opacity: 0;
+        }
+
+        .confirmation-timer {
+            background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 16px;
+            margin: 30px 0;
+            animation: fadeInUp 0.5s ease forwards 0.9s;
+            opacity: 0;
+        }
+
+        .timer-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            animation: pulse 2s ease infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .timer-text {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .timer-note {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .confirmation-details {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 25px 0;
+            text-align: left;
+            animation: fadeInUp 0.5s ease forwards 1.1s;
+            opacity: 0;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .detail-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: #64748b;
+        }
+
+        .detail-value {
+            color: #1e293b;
+            font-weight: 600;
+        }
+
+        .confirmation-button {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            animation: fadeInUp 0.5s ease forwards 1.3s;
+            opacity: 0;
+        }
+
+        .confirmation-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+        }
+
+        .confetti {
+            position: fixed;
+            width: 15px;
+            height: 15px;
+            background: #f0f;
+            opacity: 0;
+            z-index: 1999;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+        }
+
+        .no-balance-message {
+            text-align: center;
+            padding: 30px;
+            background: #fef3c7;
+            border-radius: 12px;
+            margin-top: 20px;
+            color: #92400e;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+            }
+            
+            .header-content h1 {
+                font-size: 1.6rem;
+            }
+            
+            .balance-amount {
+                font-size: 2.5rem;
+            }
+            
+            .withdraw-form {
+                padding: 25px;
+            }
+            
+            .submit-btn {
+                padding: 18px;
+            }
+            
+            .confirmation-modal {
+                padding: 30px 20px;
+            }
+            
+            .confirmation-title {
+                font-size: 1.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <button class="back-btn" onclick="window.history.back()">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <div class="header-content">
+                <h1><i class="fas fa-money-bill-wave"></i> Retirar Saldo</h1>
+                <p>Solicita retiro vía CVU a tu cuenta bancaria</p>
+            </div>
+        </div>
+
+        <div id="content">
+            <div class="loading">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Cargando información de saldo...</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification" class="notification"></div>
+
+    <!-- Overlay de confirmação -->
+    <div id="confirmationOverlay" class="confirmation-overlay">
+        <div class="confirmation-modal">
+            <div class="confirmation-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            
+            <h2 class="confirmation-title">¡Retiro Confirmado!</h2>
+            
+            <div class="confirmation-timer">
+                <div class="timer-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="timer-text">0 - 60 minutos</div>
+                <div class="timer-note">Tiempo estimado para recepción en tu cuenta</div>
+            </div>
+            
+            <p class="confirmation-message">
+                Tu solicitud de retiro ha sido procesada exitosamente. El dinero será enviado a tu cuenta bancaria.
+            </p>
+            
+            <div class="confirmation-details" id="withdrawalDetails">
+                <!-- Detalles serán insertados aquí por JavaScript -->
+            </div>
+            
+            <button class="confirmation-button" onclick="closeConfirmation()">
+                <i class="fas fa-check"></i> ¡Entendido!
+            </button>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const API_URL = '/api';
+        let currentUser = null;
+        let availableBalance = 0;
+        let socket = null;
+
+        // Configuración para Argentina
+        const ARG_CONFIG = {
+            currency: 'ARS',
+            currencySymbol: '$',
+            decimalSeparator: ',',
+            thousandSeparator: '.',
+            minWithdrawAmount: 10,
+            cvuLength: 22,
+            taxPercentage: 0.5,
+            banks: [
+                { code: 'bbva', name: 'BBVA Argentina' },
+                { code: 'galicia', name: 'Banco Galicia' },
+                { code: 'santander', name: 'Santander Río' },
+                { code: 'nacion', name: 'Banco Nación' },
+                { code: 'provincia', name: 'Banco Provincia' },
+                { code: 'icbc', name: 'ICBC Argentina' },
+                { code: 'macro', name: 'Banco Macro' },
+                { code: 'hsbc', name: 'HSBC Argentina' },
+                { code: 'credicoop', name: 'Banco Credicoop' },
+                { code: 'otros', name: 'Otro banco' }
+            ]
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem('token');
+            const user = localStorage.getItem('user');
+            
+            if (!token || !user) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            try {
+                currentUser = JSON.parse(user);
+                loadBalancePage();
+                setupWebSocket();
+            } catch (error) {
+                console.error('Error al cargar página:', error);
+                showNotification('Error: ' + error.message, 'error');
+            }
+        });
+
+        function setupWebSocket() {
+            socket = io();
+            
+            socket.on('balance_updated', (data) => {
+                if (currentUser && data.userId === currentUser.id) {
+                    availableBalance = data.availableBalance;
+                    updateBalanceDisplay();
+                }
+            });
+        }
+
+        function updateBalanceDisplay() {
+            const balanceDisplay = document.querySelector('.balance-amount');
+            if (balanceDisplay) {
+                balanceDisplay.textContent = `${ARG_CONFIG.currencySymbol} ${formatCurrency(availableBalance)}`;
+            }
+            
+            const amountInput = document.getElementById('amount');
+            if (amountInput) {
+                amountInput.max = availableBalance;
+                updateNetAmount();
+                
+                // Verificar saldo para habilitar/deshabilitar botón
+                const submitBtn = document.getElementById('submitBtn');
+                if (submitBtn) {
+                    if (availableBalance < ARG_CONFIG.minWithdrawAmount) {
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = '<i class="fas fa-exclamation-circle"></i> Saldo Insuficiente';
+                        submitBtn.classList.add('no-balance');
+                    } else {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Solicitar Retiro';
+                        submitBtn.classList.remove('no-balance');
+                    }
+                }
+            }
+        }
+
+        async function loadBalancePage() {
+            const content = document.getElementById('content');
+            
+            try {
+                const token = localStorage.getItem('token');
+                
+                const response = await fetch(`${API_URL}/balance`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Error al cargar saldo');
+                }
+                
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.error || 'Error al cargar saldo');
+                }
+                
+                availableBalance = parseFloat(data.balance.available) || 0;
+                const history = data.history || [];
+                
+                const hasBalance = availableBalance >= ARG_CONFIG.minWithdrawAmount;
+                const submitBtnText = hasBalance 
+                    ? '<i class="fas fa-paper-plane"></i> Solicitar Retiro'
+                    : '<i class="fas fa-exclamation-circle"></i> Saldo Insuficiente';
+                const submitBtnDisabled = !hasBalance;
+                const submitBtnClass = hasBalance ? '' : 'no-balance';
+                
+                content.innerHTML = `
+                    <div class="balance-info">
+                        <div class="balance-display">
+                            <div class="balance-label">Saldo Disponible para Retiro</div>
+                            <div class="balance-amount">${ARG_CONFIG.currencySymbol} ${formatCurrency(availableBalance)}</div>
+                            <div class="currency-notice">
+                                <i class="fas fa-money-bill-wave"></i>
+                                <strong>Atención:</strong> El valor será convertido y enviado a tu cuenta en ARS (Pesos Argentinos).
+                            </div>
+                        </div>
+                        
+                        <div class="tax-notice">
+                            <i class="fas fa-info-circle"></i>
+                            <div>
+                                <strong>Impuesto del ${ARG_CONFIG.taxPercentage}%:</strong> Por cada retiro se cobra un impuesto del ${ARG_CONFIG.taxPercentage}% del valor solicitado.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="withdraw-form">
+                        <h3 class="form-title">Solicitar Retiro vía CVU</h3>
+                        
+                        ${!hasBalance ? `
+                            <div class="no-balance-message">
+                                <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                                <p><strong>No tienes saldo suficiente para retirar.</strong></p>
+                                <p>El mínimo para retiro es ${ARG_CONFIG.currencySymbol} ${formatCurrency(ARG_CONFIG.minWithdrawAmount)}.</p>
+                                <p style="margin-top: 10px;">Puedes completar transacciones para ganar saldo disponible.</p>
+                            </div>
+                        ` : ''}
+                        
+                        <form id="withdrawForm">
+                            <div class="form-group">
+                                <label for="fullName">Nombre Completo</label>
+                                <input type="text" id="fullName" required 
+                                       placeholder="Ingrese su nombre completo"
+                                       value="${currentUser?.fullName || ''}">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="bank">Banco</label>
+                                <select id="bank" class="bank-selector" required ${!hasBalance ? 'disabled' : ''}>
+                                    <option value="">Seleccione su banco</option>
+                                    ${ARG_CONFIG.banks.map(bank => `
+                                        <option value="${bank.code}">${bank.name}</option>
+                                    `).join('')}
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="cvu">CVU (Clave Virtual Uniforme)</label>
+                                <input type="text" id="cvu" required 
+                                       maxlength="${ARG_CONFIG.cvuLength}"
+                                       placeholder="Ingrese los ${ARG_CONFIG.cvuLength} dígitos de su CVU"
+                                       ${!hasBalance ? 'disabled' : ''}>
+                                <div class="cvu-help">
+                                    <p>El CVU es un número de ${ARG_CONFIG.cvuLength} dígitos que identifica tu cuenta bancaria.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="amount">Monto a Retirar (${ARG_CONFIG.currencySymbol})</label>
+                                <input type="number" id="amount" required 
+                                       min="${ARG_CONFIG.minWithdrawAmount}" 
+                                       max="${availableBalance}"
+                                       step="1"
+                                       placeholder="Mínimo: ${ARG_CONFIG.currencySymbol} ${formatCurrency(ARG_CONFIG.minWithdrawAmount)}"
+                                       value="${hasBalance ? Math.min(1000, availableBalance) : 0}"
+                                       ${!hasBalance ? 'disabled' : ''}>
+                                <div style="color: #64748b; font-size: 0.9rem; margin-top: 8px;">
+                                    Disponible: ${ARG_CONFIG.currencySymbol} ${formatCurrency(availableBalance)} | 
+                                    Recibirás: <span id="netAmount">${ARG_CONFIG.currencySymbol} 0</span>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="submit-btn ${submitBtnClass}" id="submitBtn" ${submitBtnDisabled ? 'disabled' : ''}>
+                                ${submitBtnText}
+                            </button>
+                        </form>
+                    </div>
+                    
+                    ${history.length > 0 ? `
+                        <div class="withdraw-history">
+                            <h3 class="history-title">Historial de Retiros</h3>
+                            <div class="history-list">
+                                ${history.filter(h => h.type === 'withdraw').map(item => `
+                                    <div class="history-item">
+                                        <div class="history-info">
+                                            <h4>Retiro CVU - ${item.bankName || 'Banco'} - ${item.fullName || 'N/A'}</h4>
+                                            <p>${formatDateTime(item.timestamp)} • ${getStatusText(item.status || 'processing')}</p>
+                                            <p style="color: #94a3b8; font-size: 0.85rem;">
+                                                Recibido: ${ARG_CONFIG.currencySymbol} ${formatCurrency(Math.abs(item.netAmount || 0))}
+                                            </p>
+                                        </div>
+                                        <div class="history-amount negative">
+                                            -${ARG_CONFIG.currencySymbol} ${formatCurrency(Math.abs(item.amount || 0))}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                `;
+                
+                const amountInput = document.getElementById('amount');
+                const netAmountSpan = document.getElementById('netAmount');
+                
+                if (amountInput && netAmountSpan) {
+                    amountInput.addEventListener('input', updateNetAmount);
+                    updateNetAmount();
+                }
+                
+                const form = document.getElementById('withdrawForm');
+                if (form) {
+                    form.addEventListener('submit', handleWithdrawSubmit);
+                }
+                
+                if (currentUser?.bank) {
+                    const bankSelect = document.getElementById('bank');
+                    if (bankSelect) {
+                        bankSelect.value = currentUser.bank;
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                content.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #ef4444;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 20px;"></i>
+                        <h3 style="margin-bottom: 10px;">Error al cargar página</h3>
+                        <p>${error.message}</p>
+                        <button onclick="window.location.href='dashboard.html'" 
+                                style="background: #7c3aed; color: white; border: none; padding: 12px 24px; border-radius: 8px; margin-top: 20px; cursor: pointer;">
+                            Volver al Dashboard
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        function updateNetAmount() {
+            const amountInput = document.getElementById('amount');
+            const netAmountSpan = document.getElementById('netAmount');
+            
+            if (!amountInput || !netAmountSpan) return;
+            
+            const amount = parseFloat(amountInput.value) || 0;
+            const fee = amount * (ARG_CONFIG.taxPercentage / 100);
+            const netAmount = amount - fee;
+            
+            netAmountSpan.textContent = `${ARG_CONFIG.currencySymbol} ${formatCurrency(netAmount)}`;
+        }
+
+        async function handleWithdrawSubmit(e) {
+            e.preventDefault();
+            
+            // Coletar dados do formulário
+            const fullName = document.getElementById('fullName').value.trim();
+            const bankSelect = document.getElementById('bank');
+            const bankCode = bankSelect ? bankSelect.value : '';
+            const bankName = bankSelect ? bankSelect.options[bankSelect.selectedIndex].text : '';
+            const cvu = document.getElementById('cvu').value.trim();
+            const amount = document.getElementById('amount').value;
+            
+            // Verificar se tem saldo suficiente
+            if (availableBalance < ARG_CONFIG.minWithdrawAmount) {
+                showNotification('Saldo insuficiente para realizar retiro', 'error');
+                return;
+            }
+            
+            const numericAmount = parseFloat(amount) || ARG_CONFIG.minWithdrawAmount;
+            
+            if (numericAmount > availableBalance) {
+                showNotification('El monto solicitado excede tu saldo disponible', 'error');
+                return;
+            }
+            
+            // Calcular valores
+            const fee = numericAmount * (ARG_CONFIG.taxPercentage / 100);
+            const netAmount = numericAmount - fee;
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+            submitBtn.disabled = true;
+            
+            try {
+                const token = localStorage.getItem('token');
+                
+                const response = await fetch(`${API_URL}/balance/withdraw`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        amount: numericAmount,
+                        cvu: cvu,
+                        fullName: fullName || "Usuario SafeTrade",
+                        bank: bankCode,
+                        bankName: bankName || "Banco Argentina"
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.error || 'Error al procesar retiro');
+                }
+                
+                // ATUALIZAR O SALDO LOCALMENTE
+                if (data.newBalance !== undefined) {
+                    availableBalance = data.newBalance;
+                }
+                
+                // Mostrar confirmação com os dados do saque
+                showWithdrawalConfirmation({
+                    fullName: fullName || "Usuario SafeTrade",
+                    bankName: bankName || "Banco Argentina",
+                    cvu: cvu || "CVU generado automáticamente",
+                    amount: numericAmount,
+                    fee: fee,
+                    netAmount: netAmount
+                });
+                
+                // Mostrar notificação de sucesso
+                showNotification('✅ Retiro procesado exitosamente', 'success');
+                
+            } catch (error) {
+                console.error('Error en el retiro:', error);
+                showNotification('Error: ' + error.message, 'error');
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        }
+
+        function showWithdrawalConfirmation(details) {
+            // Criar confetes
+            createConfetti();
+            
+            // Mostrar overlay de confirmação
+            const overlay = document.getElementById('confirmationOverlay');
+            const detailsDiv = document.getElementById('withdrawalDetails');
+            
+            // Preencher detalhes simplificados (SEM conversão)
+            detailsDiv.innerHTML = `
+                <div class="detail-item">
+                    <span class="detail-label">Nombre:</span>
+                    <span class="detail-value">${details.fullName}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Banco:</span>
+                    <span class="detail-value">${details.bankName}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">CVU:</span>
+                    <span class="detail-value">${details.cvu.substring(0, 8)}****${details.cvu.substring(details.cvu.length - 4)}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Monto solicitado:</span>
+                    <span class="detail-value">${ARG_CONFIG.currencySymbol} ${formatCurrency(details.amount)}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Impuesto (${ARG_CONFIG.taxPercentage}%):</span>
+                    <span class="detail-value">${ARG_CONFIG.currencySymbol} ${formatCurrency(details.fee)}</span>
+                </div>
+                <div class="detail-item" style="border-top: 2px solid #7c3aed; padding-top: 20px;">
+                    <span class="detail-label">Total a recibir:</span>
+                    <span class="detail-value" style="color: #10b981; font-size: 1.2rem;">
+                        ${ARG_CONFIG.currencySymbol} ${formatCurrency(details.netAmount)}
+                    </span>
+                </div>
+            `;
+            
+            // Mostrar overlay com animação
+            overlay.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeConfirmation() {
+            const overlay = document.getElementById('confirmationOverlay');
+            overlay.classList.remove('show');
+            document.body.style.overflow = 'auto';
+            
+            // Recarregar página após fechar
+            setTimeout(() => {
+                loadBalancePage();
+            }, 500);
+        }
+
+        function createConfetti() {
+            const colors = ['#7c3aed', '#10b981', '#3b82f6', '#f59e0b', '#ef4444'];
+            
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.top = '-20px';
+                confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                
+                document.body.appendChild(confetti);
+                
+                // Animar confete
+                const animation = confetti.animate([
+                    { 
+                        transform: `translateY(0) rotate(0deg)`,
+                        opacity: 1
+                    },
+                    { 
+                        transform: `translateY(${Math.random() * 100 + 100}vh) rotate(${Math.random() * 720}deg)`,
+                        opacity: 0
+                    }
+                ], {
+                    duration: Math.random() * 3000 + 2000,
+                    easing: 'cubic-bezier(0.215, 0.610, 0.355, 1)'
+                });
+                
+                // Remover após animação
+                animation.onfinish = () => confetti.remove();
+            }
+        }
+
+        function formatCurrency(value) {
+            if (isNaN(value)) value = 0;
+            return Math.round(value).toLocaleString('es-AR');
+        }
+
+        function formatDateTime(dateString) {
+            try {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('es-AR') + ' ' + date.toLocaleTimeString('es-AR', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+            } catch (e) {
+                return '--/--/---- --:--';
+            }
+        }
+
+        function getStatusText(status) {
+            const statusMap = {
+                'processing': 'Procesando',
+                'completed': 'Completado',
+                'pending': 'Pendiente',
+                'failed': 'Fallido',
+                'cancelled': 'Cancelado'
+            };
+            return statusMap[status] || status;
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            if (!notification) return;
+            
+            notification.textContent = message;
+            notification.className = `notification show ${type}`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html> 
